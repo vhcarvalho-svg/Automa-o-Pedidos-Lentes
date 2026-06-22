@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pedido de Lentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F6F1;--surface:#FFFFFF;--ink:#16302E;--ink-soft:#4A615E;
+    --line:#E4E2D8;--teal:#0E7C7B;--teal-deep:#0B5E5D;--gold:#B5742B;
+    --slate:#64748B;--violet:#6D5BD0;--amber:#C77F2E;--blue:#2563A8;--green:#1E8254;--red:#C0463B;
+    --shadow:0 1px 2px rgba(22,48,46,.06),0 6px 20px rgba(22,48,46,.06);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding-bottom:96px}
+  .mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding:18px 18px 12px;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:11px}
+  .eye{width:34px;height:34px;flex:0 0 auto}
+  h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.02em}
+  .sub{font-size:12px;color:var(--ink-soft);margin-top:1px}
+
+  .stats{display:flex;gap:8px;margin-top:14px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .stats::-webkit-scrollbar{display:none}
+  .stat{flex:0 0 auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-width:68px}
+  .stat .n{font-size:18px;font-weight:700;line-height:1}
+  .stat .l{font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
+  .stat.money .n{color:var(--gold);font-size:15px}
+  .save-status{font-size:11px;padding:3px 10px;border-radius:99px;margin-top:8px;display:inline-block;font-weight:600}
+  .save-ok{background:#E6F3EC;color:var(--green)}
+  .save-warn{background:#FBF1E3;color:var(--amber)}
+
+  .tools{padding:14px 18px 4px}
+  .search{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;color:var(--ink)}
+  .search::placeholder{color:#9AA8A5}
+  .chips{display:flex;gap:7px;margin-top:11px;overflow-x:auto;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  main{padding:8px 14px 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;box-shadow:var(--shadow)}
+  .crow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .nm{font-size:16.5px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+  .meta{font-size:12px;color:var(--ink-soft);margin-top:3px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .local{font-weight:600;color:var(--teal-deep)}
+  .badge{font-size:11px;font-weight:600;padding:5px 10px;border-radius:999px;cursor:pointer;white-space:nowrap;border:1px solid transparent}
+  .b-orcado{background:#EEF1F4;color:var(--slate);border-color:#DCE2E8}
+  .b-confirmado{background:#EFEBFA;color:var(--violet);border-color:#DED7F4}
+  .b-encomendado{background:#FBF1E3;color:var(--amber);border-color:#F2E0C5}
+  .b-recebido{background:#E8F0FA;color:var(--blue);border-color:#D2E2F3}
+  .b-entregue{background:#E6F3EC;color:var(--green);border-color:#C9E7D6}
+
+  .rx{display:grid;grid-template-columns:auto repeat(4,1fr);gap:3px 8px;margin-top:13px;padding:11px 13px;background:#FBFAF6;border:1px solid var(--line);border-radius:11px;align-items:center}
+  .rx .h{font-size:9px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;font-weight:600;text-align:center}
+  .rx .eyelbl{font-size:11px;font-weight:700;color:var(--teal-deep)}
+  .rx .v{font-size:13px;font-weight:500;text-align:center}
+  .rx-extra{font-size:12px;color:var(--ink-soft);margin-top:8px;padding-left:2px}
+  .rx-extra span{color:var(--ink);font-weight:500}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
+  .tel{font-size:13px;color:var(--teal-deep);font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px}
+  .val{font-size:17px;font-weight:700;color:var(--gold)}
+  .acts{display:flex;gap:6px;margin-top:11px}
+  .act{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px;font-size:13px;font-weight:500;color:var(--ink-soft);cursor:pointer;font-family:inherit}
+  .act.del{color:var(--red)}
+
+  .empty{text-align:center;padding:54px 24px;color:var(--ink-soft)}
+  .empty .big{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px}
+
+  .fab{position:fixed;bottom:0;left:0;right:0;padding:14px 18px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 28%);z-index:30;display:flex;gap:10px}
+  .btn{flex:1;border:none;border-radius:14px;padding:16px;font-size:15.5px;font-weight:600;font-family:inherit;cursor:pointer}
+  .btn-pri{background:var(--teal);color:#fff;flex:2;box-shadow:0 6px 18px rgba(14,124,123,.32)}
+  .btn-sec{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+
+  /* sheet */
+  .scrim{position:fixed;inset:0;background:rgba(22,48,46,.42);z-index:40;display:none;align-items:flex-end}
+  .scrim.show{display:flex}
+  .sheet{background:var(--surface);width:100%;max-height:94vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:8px 18px calc(22px + env(safe-area-inset-bottom))}
+  .grab{width:38px;height:4px;background:var(--line);border-radius:99px;margin:8px auto 14px}
+  .sheet h2{font-size:18px;margin:0 0 16px;font-weight:700}
+  label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin:0 0 6px;text-transform:uppercase;letter-spacing:.05em}
+  input,select{width:100%;border:1px solid var(--line);background:#FBFAF6;border-radius:11px;padding:13px;font-size:16px;font-family:inherit;color:var(--ink);margin-bottom:14px}
+  input:focus,select:focus,.search:focus{outline:none;border-color:var(--teal)}
+  .field-row{display:flex;gap:10px}
+  .field-row>div{flex:1}
+  .rxhead{font-size:11px;font-weight:700;color:var(--teal-deep);text-transform:uppercase;letter-spacing:.06em;margin:6px 0 9px}
+
+  /* wheels */
+  .wheels{display:flex;gap:6px;margin-bottom:6px}
+  .wheel{flex:1;min-width:0}
+  .wheel-cap{font-size:10px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;text-align:center;margin-bottom:5px}
+  .wheel-box{position:relative;height:108px;border:1px solid var(--line);border-radius:12px;background:#FBFAF6;overflow:hidden}
+  .wheel-band{position:absolute;left:4px;right:4px;top:36px;height:36px;border-top:1px solid var(--teal);border-bottom:1px solid var(--teal);background:rgba(14,124,123,.07);pointer-events:none;border-radius:6px;z-index:1}
+  .wheel-scroll{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;padding:36px 0;scrollbar-width:none;position:relative;z-index:2;-webkit-mask:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+  .wheel-scroll::-webkit-scrollbar{display:none}
+  .wheel-item{height:36px;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-size:14.5px;color:var(--ink)}
+
+  /* backup sheet */
+  .bk-area{width:100%;height:120px;border:1px solid var(--line);border-radius:11px;padding:10px;font-size:12px;font-family:"JetBrains Mono",monospace;background:#FBFAF6;resize:none;color:var(--ink);margin-bottom:12px}
+  .bk-area:focus{outline:none;border-color:var(--teal)}
+
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .loading{text-align:center;padding:60px;color:var(--ink-soft);font-size:14px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg class="eye" viewBox="0 0 40 40" fill="none">
+      <path d="M3 20C3 20 9 9 20 9C31 9 37 20 37 20C37 20 31 31 20 31C9 31 3 20 3 20Z" stroke="#0E7C7B" stroke-width="2.4"/>
+      <circle cx="20" cy="20" r="6.4" fill="#16302E"/>
+      <circle cx="22.4" cy="17.6" r="2" fill="#fff"/>
+    </svg>
+    <div>
+      <h1>Pedidos de Lentes</h1>
+      <div class="sub" id="sub">Controle de encomendas</div>
+    </div>
+  </div>
+  <div id="saveStatus"></div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="tools">
+  <input class="search" id="search" placeholder="Buscar por nome…" oninput="render()">
+  <div class="chips" id="chips"></div>
+</div>
+
+<main id="list"><div class="loading">Carregando pedidos…</div></main>
+
+<div class="fab">
+  <button class="btn btn-sec" onclick="openBackup()">⋯</button>
+  <button class="btn btn-sec" onclick="exportar()" style="flex:1">Exportar</button>
+  <button class="btn btn-pri" onclick="openForm()">+ Novo pedido</button>
+</div>
+
+<!-- Formulário -->
+<div class="scrim" id="scrim" onclick="if(event.target===this)closeForm()">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2 id="formTitle">Novo pedido</h2>
+    <input type="hidden" id="f_id">
+    <div class="field-row">
+      <div><label>Data</label><input type="date" id="f_data"></div>
+      <div><label>Valor (R$)</label><input type="number" inputmode="decimal" id="f_valor" placeholder="0,00"></div>
+    </div>
+    <label>Nome do paciente</label>
+    <input id="f_nome" placeholder="Nome completo">
+    <div class="field-row">
+      <div>
+        <label>Local</label>
+        <select id="f_local">
+          <option>Bom Princípio</option>
+          <option>Consultório</option>
+          <option>Canoas-CCG</option>
+          <option>Nilo Peçanha</option>
+        </select>
+      </div>
+      <div><label>Telefone</label><input id="f_tel" inputmode="tel" placeholder="(54) 9…"></div>
+    </div>
+    <div class="rxhead">Olho Direito (OD)</div>
+    <div class="wheels" id="wheels_od"></div>
+    <div class="rxhead">Olho Esquerdo (OE)</div>
+    <div class="wheels" id="wheels_oe"></div>
+    <label style="margin-top:6px">Outros (marca, BC, DIÂ…)</label>
+    <input id="f_extra" placeholder="Ex.: Acuvue Oasys · BC 8.4 · DIÂ 14.0">
+    <label>Status</label>
+    <select id="f_status">
+      <option value="orcado">Orçado</option>
+      <option value="confirmado">Confirmado</option>
+      <option value="encomendado">Encomendado</option>
+      <option value="recebido">Recebido</option>
+      <option value="entregue">Entregue</option>
+    </select>
+    <div class="fab" style="position:static;padding:6px 0 0;background:none">
+      <button class="btn btn-sec" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-pri" onclick="salvar()">Salvar pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- Backup / Restaurar -->
+<div class="scrim" id="scrimBk" onclick="if(event.target===this)closeBackup()">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h2>Backup / Restaurar</h2>
+    <p style="font-size:13px;color:var(--ink-soft);margin:0 0 14px">
+      <b>Exportar:</b> copie o JSON abaixo e salve em Notas ou WhatsApp.<br>
+      <b>Restaurar:</b> cole um JSON salvo e toque em Restaurar.
+    </p>
+    <label>JSON dos pedidos</label>
+    <textarea class="bk-area" id="bkArea" placeholder="Cole aqui o JSON para restaurar…"></textarea>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-sec" style="flex:1;padding:13px" onclick="copiarJSON()">Copiar JSON</button>
+      <button class="btn btn-pri" style="flex:1;padding:13px" onclick="restaurar()">Restaurar</button>
+    </div>
+    <button class="btn btn-sec" style="width:100%;margin-top:10px;padding:13px" onclick="closeBackup()">Fechar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY="pedidos-lentes-v2";
+const STATUS={
+  orcado:{l:"Orçado",c:"b-orcado"},confirmado:{l:"Confirmado",c:"b-confirmado"},
+  encomendado:{l:"Encomendado",c:"b-encomendado"},recebido:{l:"Recebido",c:"b-recebido"},
+  entregue:{l:"Entregue",c:"b-entregue"}
+};
+const ORDER=["orcado","confirmado","encomendado","recebido","entregue"];
+let pedidos=[], filtro="todos", storageMode="none";
+
+/* ── Storage com duplo fallback ── */
+async function storageGet(k){
+  // 1. window.storage (Claude artifact)
+  try{ if(window.storage){ const r=await window.storage.get(k); return r&&r.value?r.value:null; } }catch(e){}
+  // 2. localStorage (navegador local)
+  try{ const v=localStorage.getItem(k); return v||null; }catch(e){}
+  return null;
+}
+async function storageSet(k,v){
+  let saved=false;
+  try{ if(window.storage){ await window.storage.set(k,v); saved=true; storageMode="cloud"; } }catch(e){}
+  if(!saved){ try{ localStorage.setItem(k,v); saved=true; storageMode="local"; }catch(e){} }
+  if(!saved){ storageMode="none"; }
+  return saved;
+}
+
+/* ── Wheels ── */
+function fmtP(v){ if(Math.abs(v)<1e-6)return"Plano"; return(v>0?"+":"-")+Math.abs(v).toFixed(2).replace(".",","); }
+const W={
+  esf:(()=>{const a=[];for(let i=-48;i<=40;i++)a.push(fmtP(i*.25));return a;})(),
+  cil:(()=>{const a=[];for(let i=0;i>=-10;i--)a.push(fmtP(i*.25));return a;})(),
+  eixo:(()=>{const a=["Plano"];for(let i=1;i<=180;i++)a.push(i+"°");return a;})(),
+  add:(()=>{const a=[];for(let i=0;i<=12;i++)a.push(fmtP(i*.25));return a;})()
+};
+const FW={od_esf:"esf",od_cil:"cil",od_eixo:"eixo",od_add:"add",oe_esf:"esf",oe_cil:"cil",oe_eixo:"eixo",oe_add:"add"};
+function defIdx(t){ if(t==="eixo"){const j=W.eixo.indexOf("90°");return j<0?0:j;} const i=W[t].indexOf("Plano");return i<0?0:i; }
+function buildWheels(){
+  const caps={esf:"Esf",cil:"Cil",eixo:"Eixo",add:"Adição"};
+  const grp=keys=>keys.map(k=>{const t=FW[k];
+    return`<div class="wheel"><div class="wheel-cap">${caps[t]}</div><div class="wheel-box"><div class="wheel-band"></div><div class="wheel-scroll" id="w_${k}">${W[t].map(o=>`<div class="wheel-item">${o}</div>`).join("")}</div></div></div>`;
+  }).join("");
+  document.getElementById("wheels_od").innerHTML=grp(["od_esf","od_cil","od_eixo","od_add"]);
+  document.getElementById("wheels_oe").innerHTML=grp(["oe_esf","oe_cil","oe_eixo","oe_add"]);
+}
+function readWheel(k){ const el=document.getElementById("w_"+k);const arr=W[FW[k]];let i=Math.round(el.scrollTop/36);i=Math.max(0,Math.min(arr.length-1,i));return arr[i]; }
+function setWheel(k,val){ const el=document.getElementById("w_"+k);const t=FW[k];let i=W[t].indexOf(val);if(i<0)i=defIdx(t);el.scrollTop=i*36; }
+
+/* ── Load / Save ── */
+async function load(){
+  buildWheels();
+  const raw=await storageGet(KEY);
+  try{ pedidos=raw?JSON.parse(raw):[]; }catch(e){ pedidos=[]; }
+  updateSaveStatus(); render();
+}
+async function save(){
+  const json=JSON.stringify(pedidos);
+  const ok=await storageSet(KEY,json);
+  updateSaveStatus();
+  if(!ok){ toast("⚠️ Não foi salvar automaticamente.\nUse Backup para não perder os dados."); }
+}
+function updateSaveStatus(){
+  const el=document.getElementById("saveStatus");
+  if(storageMode==="cloud") el.innerHTML='<span class="save-status save-ok">✓ Salvo automaticamente</span>';
+  else if(storageMode==="local") el.innerHTML='<span class="save-status save-ok">✓ Salvo no dispositivo</span>';
+  else if(pedidos.length>0) el.innerHTML='<span class="save-status save-warn">⚠️ Use Backup para salvar</span>';
+  else el.innerHTML="";
+}
+
+/* ── Helpers ── */
+function money(v){ const n=parseFloat(v);if(isNaN(n))return"—";return n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+function fmtDate(d){ if(!d)return"—";const[y,m,dd]=d.split("-");return`${dd}/${m}/${y.slice(2)}`; }
+function rxv(v){ return v&&String(v).trim()?v:"—"; }
+function esc(s){ return(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function setFiltro(k){ filtro=k;render(); }
+function toast(m,dur=2400){ const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),dur); }
+
+/* ── Render ── */
+function render(){
+  const q=document.getElementById("search").value.toLowerCase().trim();
+  let list=[...pedidos].sort((a,b)=>(b.data||"").localeCompare(a.data||"")||b.id-a.id);
+  if(filtro!=="todos")list=list.filter(p=>p.status===filtro);
+  if(q)list=list.filter(p=>(p.nome||"").toLowerCase().includes(q));
+  const cont={};ORDER.forEach(s=>cont[s]=0);let pend=0;
+  pedidos.forEach(p=>{ cont[p.status]=(cont[p.status]||0)+1; if(p.status!=="entregue"){const n=parseFloat(p.valor);if(!isNaN(n))pend+=n;} });
+  document.getElementById("stats").innerHTML=
+    `<div class="stat"><div class="n">${pedidos.length}</div><div class="l">Total</div></div>`+
+    ORDER.map(s=>`<div class="stat"><div class="n">${cont[s]}</div><div class="l">${STATUS[s].l}</div></div>`).join("")+
+    `<div class="stat money"><div class="n">${pend.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div><div class="l">Em aberto</div></div>`;
+  document.getElementById("sub").textContent=pedidos.length?`${pedidos.length} pedido${pedidos.length>1?"s":""} registrado${pedidos.length>1?"s":""}`:"Controle de encomendas";
+  const chips=[["todos","Todos"],...ORDER.map(s=>[s,STATUS[s].l])];
+  document.getElementById("chips").innerHTML=chips.map(([k,l])=>
+    `<div class="chip ${filtro===k?"on":""}" onclick="setFiltro('${k}')">${l}</div>`).join("");
+  const el=document.getElementById("list");
+  if(!list.length){ el.innerHTML=`<div class="empty"><div class="big">${pedidos.length?"Nada aqui":"Comece agora"}</div>${pedidos.length?"Nenhum pedido neste filtro.":"Toque em <b>+ Novo pedido</b> para registrar a primeira encomenda."}</div>`;return; }
+  el.innerHTML=list.map(p=>{
+    const st=STATUS[p.status]||STATUS.orcado;
+    const tel=(p.tel||"").replace(/\D/g,"");
+    return`<div class="card">
+      <div class="crow"><div><div class="nm">${esc(p.nome)||"Sem nome"}</div>
+        <div class="meta"><span class="local">${esc(p.local)}</span>·<span>${fmtDate(p.data)}</span></div></div>
+        <span class="badge ${st.c}" onclick="cycle(${p.id})">${st.l}</span></div>
+      <div class="rx">
+        <div class="h"></div><div class="h">Esf</div><div class="h">Cil</div><div class="h">Eixo</div><div class="h">Ad</div>
+        <div class="eyelbl">OD</div><div class="v mono">${rxv(p.od_esf)}</div><div class="v mono">${rxv(p.od_cil)}</div><div class="v mono">${rxv(p.od_eixo)}</div><div class="v mono">${rxv(p.od_add)}</div>
+        <div class="eyelbl">OE</div><div class="v mono">${rxv(p.oe_esf)}</div><div class="v mono">${rxv(p.oe_cil)}</div><div class="v mono">${rxv(p.oe_eixo)}</div><div class="v mono">${rxv(p.oe_add)}</div>
+      </div>
+      ${p.extra?`<div class="rx-extra"><span>${esc(p.extra)}</span></div>`:""}
+      <div class="foot">
+        ${tel?`<a class="tel" href="tel:${tel}">📞 ${esc(p.tel)}</a>`:`<span class="tel" style="color:#9AA8A5">Sem telefone</span>`}
+        <div class="val">${money(p.valor)}</div>
+      </div>
+      <div class="acts">
+        <button class="act" onclick="openForm(${p.id})">Editar</button>
+        <button class="act del" onclick="del(${p.id})">Excluir</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ── CRUD ── */
+async function cycle(id){ const p=pedidos.find(x=>x.id===id);if(!p)return;
+  const i=ORDER.indexOf(p.status);p.status=ORDER[(i+1)%ORDER.length];await save();render(); }
+
+function openForm(id){
+  const s=document.getElementById("scrim");
+  document.getElementById("formTitle").textContent=id?"Editar pedido":"Novo pedido";
+  const g=k=>document.getElementById("f_"+k);
+  const wk=["od_esf","od_cil","od_eixo","od_add","oe_esf","oe_cil","oe_eixo","oe_add"];
+  if(id){ const p=pedidos.find(x=>x.id===id);
+    g("id").value=p.id;g("data").value=p.data||"";g("valor").value=p.valor||"";
+    g("nome").value=p.nome||"";g("local").value=p.local||"Canoas-CCG";g("tel").value=p.tel||"";
+    g("extra").value=p.extra||"";g("status").value=p.status||"orcado";
+    s.classList.add("show");document.body.style.overflow="hidden";
+    setTimeout(()=>wk.forEach(k=>setWheel(k,p[k])),40);
+  } else {
+    ["id","valor","nome","tel","extra"].forEach(k=>g(k).value="");
+    g("data").value=new Date().toISOString().slice(0,10);g("local").value="Canoas-CCG";g("status").value="orcado";
+    s.classList.add("show");document.body.style.overflow="hidden";
+    setTimeout(()=>wk.forEach(k=>setWheel(k,null)),40);
+  }
+}
+function closeForm(){ document.getElementById("scrim").classList.remove("show");document.body.style.overflow=""; }
+
+async function salvar(){
+  const g=k=>document.getElementById("f_"+k).value.trim();
+  if(!g("nome")){ toast("Informe o nome do paciente.");return; }
+  const obj={ id:g("id")?parseInt(g("id")):Date.now(),
+    data:g("data"),valor:g("valor"),nome:g("nome"),local:g("local"),tel:g("tel"),
+    od_esf:readWheel("od_esf"),od_cil:readWheel("od_cil"),od_eixo:readWheel("od_eixo"),od_add:readWheel("od_add"),
+    oe_esf:readWheel("oe_esf"),oe_cil:readWheel("oe_cil"),oe_eixo:readWheel("oe_eixo"),oe_add:readWheel("oe_add"),
+    extra:g("extra"),status:g("status") };
+  const i=pedidos.findIndex(x=>x.id===obj.id);
+  if(i>=0)pedidos[i]=obj;else pedidos.push(obj);
+  await save();closeForm();render();toast(i>=0?"Pedido atualizado ✓":"Pedido salvo ✓");
+}
+async function del(id){ const p=pedidos.find(x=>x.id===id);
+  if(!confirm(`Excluir pedido de ${p?p.nome:"este paciente"}?`))return;
+  pedidos=pedidos.filter(x=>x.id!==id);await save();render();toast("Pedido excluído"); }
+
+/* ── Exportar lista legível ── */
+async function exportar(){
+  if(!pedidos.length){ toast("Nenhum pedido para exportar.");return; }
+  const list=[...pedidos].sort((a,b)=>(a.data||"").localeCompare(b.data||""));
+  const txt=list.map(p=>{
+    const st=(STATUS[p.status]||STATUS.orcado).l;
+    return`${fmtDate(p.data)} · ${p.nome} (${p.local}) — ${st}\n   OD  Esf ${rxv(p.od_esf)}  Cil ${rxv(p.od_cil)}  Eixo ${rxv(p.od_eixo)}  Ad ${rxv(p.od_add)}\n   OE  Esf ${rxv(p.oe_esf)}  Cil ${rxv(p.oe_cil)}  Eixo ${rxv(p.oe_eixo)}  Ad ${rxv(p.oe_add)}`+
+    (p.extra?`\n   ${p.extra}`:"")+`\n   Tel: ${p.tel||"—"}  |  Valor: ${money(p.valor)}`;
+  }).join("\n\n");
+  const head=`PEDIDOS DE LENTES — ${pedidos.length} registro(s)\n${"=".repeat(34)}\n\n`;
+  try{ await navigator.clipboard.writeText(head+txt);toast("Lista copiada! Cole onde quiser."); }
+  catch(e){ alert(head+txt); }
+}
+
+/* ── Backup JSON ── */
+function openBackup(){
+  document.getElementById("bkArea").value=pedidos.length?JSON.stringify(pedidos,null,2):"";
+  document.getElementById("scrimBk").classList.add("show");document.body.style.overflow="hidden";
+}
+function closeBackup(){ document.getElementById("scrimBk").classList.remove("show");document.body.style.overflow=""; }
+async function copiarJSON(){
+  const json=JSON.stringify(pedidos,null,2);
+  try{ await navigator.clipboard.writeText(json);toast("JSON copiado! Salve em Notas."); }
+  catch(e){ document.getElementById("bkArea").value=json;toast("Selecione e copie o texto acima."); }
+}
+async function restaurar(){
+  const raw=document.getElementById("bkArea").value.trim();
+  if(!raw){ toast("Cole o JSON antes de restaurar.");return; }
+  try{
+    const arr=JSON.parse(raw);
+    if(!Array.isArray(arr))throw new Error();
+    if(!confirm(`Restaurar ${arr.length} pedido(s)? Os dados atuais serão substituídos.`))return;
+    pedidos=arr;await save();render();closeBackup();toast(`${arr.length} pedido(s) restaurado(s) ✓`);
+  }catch(e){ toast("JSON inválido. Verifique o conteúdo."); }
+}
+
+load();
+</script>
+</body>
+</html>
